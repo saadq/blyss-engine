@@ -1,10 +1,10 @@
 {
-  "name": "standard-engine",
-  "description": "Wrap your standards in a tortilla and cover it in special sauce.",
-  "version": "7.2.0",
-  "author": "Dan Flettre <flettre@gmail.com> (http://twitter.com/flettre/)",
+  "name": "blyss-engine",
+  "description": "The engine that powers the Blyss linter",
+  "version": "0.0.0",
+  "author": "Saad Quadri",
   "bugs": {
-    "url": "https://github.com/flet/standard-engine/issues"
+    "url": "https://github.com/saadq/blyss-engine/issues"
   },
   "dependencies": {
     "deglob": "^2.1.0",
@@ -13,25 +13,14 @@
     "pkg-conf": "^2.0.0"
   },
   "devDependencies": {
-    "babel-eslint": "^7.1.1",
+    "blyss": "^9.0.0",
     "cross-spawn": "^5.0.0",
-    "eslint": "^3.0.1",
-    "eslint-config-standard": "^10.2.1",
-    "eslint-config-standard-jsx": "^4.0.2",
-    "eslint-plugin-import": "^2.2.0",
-    "eslint-plugin-node": "^4.2.2",
-    "eslint-plugin-promise": "^3.4.0",
-    "eslint-plugin-react": "^6.0.0",
-    "eslint-plugin-standard": "^3.0.1",
     "mkdirp": "^0.5.0",
-    "run-parallel-limit": "^1.0.1",
-    "standard": "*",
-    "standard-packages": "^3.0.14",
-    "tape": "^4.0.0"
+    "run-parallel-limit": "^1.0.1"
   },
-  "homepage": "https://github.com/flet/standard-engine",
+  "homepage": "https://github.com/saadq/blyss-engine",
   "keywords": [
-    "JavaScript Standard Style",
+    "JavaScript Blyss Style",
     "check",
     "checker",
     "code",
@@ -59,12 +48,13 @@
   "main": "index.js",
   "repository": {
     "type": "git",
-    "url": "git://github.com/flet/standard-engine.git"
+    "url": "git://github.com/saadq/blyss-engine.git"
+  },
+  "engines": {
+    "node": ">=4.0.0"
   },
   "scripts": {
-    "test": "standard && tape test/clone.js test/api.js",
-    "test-offline": "npm test -- --offline",
-    "test-quick": "npm test -- --quick",
-    "test-offline-quick": "npm test -- --offline --quick"
+    "test": "blyss",
+    "fix": "blyss --fix"
   }
 }

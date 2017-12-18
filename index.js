@@ -1,20 +1,20 @@
 module.exports.cli = require('./bin/cmd')
-
 module.exports.linter = Linter
 
-var deglob = require('deglob')
-var os = require('os')
-var path = require('path')
-var pkgConf = require('pkg-conf')
+const deglob = require('deglob')
+const os = require('os')
+const path = require('path')
+const pkgConf = require('pkg-conf')
 
-var HOME_OR_TMP = os.homedir() || os.tmpdir()
+const HOME_OR_TMP = os.homedir() || os.tmpdir()
 
-var DEFAULT_PATTERNS = [
+const DEFAULT_PATTERNS = [
   '**/*.js',
   '**/*.jsx'
 ]
 
-var DEFAULT_IGNORE = [
+const DEFAULT_IGNORE = [
+  'flow-typed/npm/**/*.js',
   '**/*.min.js',
   '**/bundle.js',
   'coverage/**',
@@ -22,11 +22,11 @@ var DEFAULT_IGNORE = [
   'vendor/**'
 ]
 
-function Linter (opts) {
+function Linter(opts) {
   if (!(this instanceof Linter)) return new Linter(opts)
   if (!opts) opts = {}
 
-  this.cmd = opts.cmd || 'standard'
+  this.cmd = opts.cmd || 'blyss'
   this.eslint = opts.eslint
   this.cwd = opts.cwd
   if (!this.eslint) throw new Error('opts.eslint option is required')
@@ -34,7 +34,7 @@ function Linter (opts) {
 
   this.eslintConfig = Object.assign({
     cache: true,
-    cacheLocation: path.join(HOME_OR_TMP, '.standard-cache/'),
+    cacheLocation: path.join(HOME_OR_TMP, '.blyss-cache/'),
     envs: [],
     fix: false,
     globals: [],
@@ -56,14 +56,15 @@ function Linter (opts) {
  * @param {string=} opts.parser           custom js parser (e.g. babel-eslint)
  * @param {string=} opts.filename         path of the file containing the text being linted
  */
-Linter.prototype.lintTextSync = function (text, opts) {
+
+Linter.prototype.lintTextSync = function(text, opts) {
   opts = this.parseOpts(opts, false)
   return new this.eslint.CLIEngine(opts.eslintConfig).executeOnText(text, opts.filename)
 }
 
-Linter.prototype.lintText = function (text, opts, cb) {
+Linter.prototype.lintText = function(text, opts, cb) {
   if (typeof opts === 'function') return this.lintText(text, null, opts)
-  var result
+  let result
   try {
     result = this.lintTextSync(text, opts)
   } catch (err) {
@@ -86,25 +87,26 @@ Linter.prototype.lintText = function (text, opts, cb) {
  * @param {string=} opts.parser           custom js parser (e.g. babel-eslint)
  * @param {function(Error, Object)} cb    callback
  */
-Linter.prototype.lintFiles = function (files, opts, cb) {
-  var self = this
+
+Linter.prototype.lintFiles = function(files, opts, cb) {
+  const self = this
   if (typeof opts === 'function') return self.lintFiles(files, null, opts)
   opts = self.parseOpts(opts, true)
 
   if (typeof files === 'string') files = [ files ]
   if (files.length === 0) files = DEFAULT_PATTERNS
 
-  var deglobOpts = {
+  const deglobOpts = {
     ignore: opts.ignore,
     cwd: opts.cwd,
     useGitIgnore: true,
     usePackageJson: false
   }
 
-  deglob(files, deglobOpts, function (err, allFiles) {
+  deglob(files, deglobOpts, (err, allFiles) => {
     if (err) return cb(err)
 
-    var result
+    let result
     try {
       result = new self.eslint.CLIEngine(opts.eslintConfig).executeOnFiles(allFiles)
     } catch (err) {
@@ -119,8 +121,8 @@ Linter.prototype.lintFiles = function (files, opts, cb) {
   })
 }
 
-Linter.prototype.parseOpts = function (opts, usePackageJson) {
-  var self = this
+Linter.prototype.parseOpts = function(opts, usePackageJson) {
+  const self = this
 
   if (!opts) opts = {}
   opts = Object.assign({}, opts)
@@ -128,7 +130,7 @@ Linter.prototype.parseOpts = function (opts, usePackageJson) {
   opts.eslintConfig.fix = !!opts.fix
 
   if (!opts.cwd) opts.cwd = self.cwd || process.cwd()
-  var packageOpts = usePackageJson
+  const packageOpts = usePackageJson
     ? pkgConf.sync(self.cmd, { cwd: opts.cwd })
     : {}
 
@@ -150,9 +152,9 @@ Linter.prototype.parseOpts = function (opts, usePackageJson) {
   setParser(packageOpts.parser || opts.parser)
 
   if (self.customParseOpts) {
-    var rootDir
+    let rootDir
     if (usePackageJson) {
-      var filePath = pkgConf.filepath(packageOpts)
+      const filePath = pkgConf.filepath(packageOpts)
       rootDir = filePath ? path.dirname(filePath) : opts.cwd
     } else {
       rootDir = opts.cwd
@@ -160,31 +162,31 @@ Linter.prototype.parseOpts = function (opts, usePackageJson) {
     opts = self.customParseOpts(opts, packageOpts, rootDir)
   }
 
-  function addIgnore (ignore) {
+  function addIgnore(ignore) {
     if (!ignore) return
     opts.ignore = opts.ignore.concat(ignore)
   }
 
-  function addGlobals (globals) {
+  function addGlobals(globals) {
     if (!globals) return
     opts.eslintConfig.globals = self.eslintConfig.globals.concat(globals)
   }
 
-  function addPlugins (plugins) {
+  function addPlugins(plugins) {
     if (!plugins) return
     opts.eslintConfig.plugins = self.eslintConfig.plugins.concat(plugins)
   }
 
-  function addEnvs (envs) {
+  function addEnvs(envs) {
     if (!envs) return
     if (!Array.isArray(envs) && typeof envs !== 'string') {
       // envs can be an object in `package.json`
-      envs = Object.keys(envs).filter(function (env) { return envs[env] })
+      envs = Object.keys(envs).filter((env) => { return envs[env] })
     }
     opts.eslintConfig.envs = self.eslintConfig.envs.concat(envs)
   }
 
-  function setParser (parser) {
+  function setParser(parser) {
     if (!parser) return
     opts.eslintConfig.parser = parser
   }

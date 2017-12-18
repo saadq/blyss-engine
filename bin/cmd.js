@@ -2,19 +2,19 @@
 
 module.exports = Cli
 
-var minimist = require('minimist')
-var getStdin = require('get-stdin')
+const minimist = require('minimist')
+const getStdin = require('get-stdin')
 
-function Cli (opts) {
-  var standard = require('../').linter(opts)
+function Cli(opts) {
+  const blyss = require('../').linter(opts)
 
   opts = Object.assign({
-    cmd: 'standard-engine',
+    cmd: 'blyss-engine',
     tagline: 'JavaScript Custom Style',
     version: require('../package.json').version
   }, opts)
 
-  var argv = minimist(process.argv.slice(2), {
+  const argv = minimist(process.argv.slice(2), {
     alias: {
       global: 'globals',
       plugin: 'plugins',
@@ -80,7 +80,7 @@ Flags (advanced):
     return
   }
 
-  var lintOpts = {
+  const lintOpts = {
     fix: argv.fix,
     globals: argv.global,
     plugins: argv.plugin,
@@ -88,18 +88,18 @@ Flags (advanced):
     parser: argv.parser
   }
 
-  var stdinText
+  let stdinText
 
   if (argv.stdin) {
-    getStdin().then(function (text) {
+    getStdin().then((text) => {
       stdinText = text
-      standard.lintText(text, lintOpts, onResult)
+      blyss.lintText(text, lintOpts, onResult)
     })
   } else {
-    standard.lintFiles(argv._, lintOpts, onResult)
+    blyss.lintFiles(argv._, lintOpts, onResult)
   }
 
-  function onResult (err, result) {
+  function onResult(err, result) {
     if (err) return onError(err)
 
     if (argv.stdin && argv.fix) {
@@ -120,8 +120,8 @@ Flags (advanced):
     console.error('%s: %s (%s)', opts.cmd, opts.tagline, opts.homepage)
 
     // Are any fixable rules present?
-    var isFixable = result.results.some(function (result) {
-      return result.messages.some(function (message) {
+    const isFixable = result.results.some((result) => {
+      return result.messages.some((message) => {
         return !!message.fix
       })
     })
@@ -134,8 +134,8 @@ Flags (advanced):
       )
     }
 
-    result.results.forEach(function (result) {
-      result.messages.forEach(function (message) {
+    result.results.forEach((result) => {
+      result.messages.forEach((message) => {
         log(
           '  %s:%d:%d: %s%s',
           result.filePath, message.line || 0, message.column || 0, message.message,
@@ -147,7 +147,7 @@ Flags (advanced):
     process.exitCode = result.errorCount ? 1 : 0
   }
 
-  function onError (err) {
+  function onError(err) {
     console.error(opts.cmd + ': Unexpected linter output:\n')
     console.error(err.stack || err.message || err)
     console.error(
@@ -158,11 +158,12 @@ Flags (advanced):
   }
 
   /**
-   * Print lint errors to stdout -- this is expected output from `standard-engine`.
-   * Note: When fixing code from stdin (`standard --stdin --fix`), the transformed
+   * Print lint errors to stdout -- this is expected output from `blyss-engine`.
+   * Note: When fixing code from stdin (`blyss --stdin --fix`), the transformed
    * code is printed to stdout, so print lint errors to stderr in this case.
    */
-  function log () {
+
+  function log() {
     if (argv.stdin && argv.fix) {
       arguments[0] = opts.cmd + ': ' + arguments[0]
       console.error.apply(console, arguments)
