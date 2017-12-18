@@ -1,7 +1,7 @@
 {
   "name": "blyss-engine",
   "description": "The engine that powers the Blyss linter",
-  "version": "0.0.0",
+  "version": "1.0.0",
   "author": "Saad Quadri",
   "bugs": {
     "url": "https://github.com/saadq/blyss-engine/issues"
