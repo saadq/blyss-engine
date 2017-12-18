@@ -8,10 +8,7 @@ const pkgConf = require('pkg-conf')
 
 const HOME_OR_TMP = os.homedir() || os.tmpdir()
 
-const DEFAULT_PATTERNS = [
-  '**/*.js',
-  '**/*.jsx'
-]
+const DEFAULT_PATTERNS = ['**/*.js', '**/*.jsx']
 
 const DEFAULT_IGNORE = [
   'flow-typed/npm/**/*.js',
@@ -32,16 +29,19 @@ function Linter(opts) {
   if (!this.eslint) throw new Error('opts.eslint option is required')
   this.customParseOpts = opts.parseOpts
 
-  this.eslintConfig = Object.assign({
-    cache: true,
-    cacheLocation: path.join(HOME_OR_TMP, '.blyss-cache/'),
-    envs: [],
-    fix: false,
-    globals: [],
-    ignore: false,
-    plugins: [],
-    useEslintrc: false
-  }, opts.eslintConfig)
+  this.eslintConfig = Object.assign(
+    {
+      cache: true,
+      cacheLocation: path.join(HOME_OR_TMP, '.blyss-cache/'),
+      envs: [],
+      fix: false,
+      globals: [],
+      ignore: false,
+      plugins: [],
+      useEslintrc: false
+    },
+    opts.eslintConfig
+  )
 }
 
 /**
@@ -59,7 +59,10 @@ function Linter(opts) {
 
 Linter.prototype.lintTextSync = function(text, opts) {
   opts = this.parseOpts(opts, false)
-  return new this.eslint.CLIEngine(opts.eslintConfig).executeOnText(text, opts.filename)
+  return new this.eslint.CLIEngine(opts.eslintConfig).executeOnText(
+    text,
+    opts.filename
+  )
 }
 
 Linter.prototype.lintText = function(text, opts, cb) {
@@ -93,7 +96,7 @@ Linter.prototype.lintFiles = function(files, opts, cb) {
   if (typeof opts === 'function') return self.lintFiles(files, null, opts)
   opts = self.parseOpts(opts, true)
 
-  if (typeof files === 'string') files = [ files ]
+  if (typeof files === 'string') files = [files]
   if (files.length === 0) files = DEFAULT_PATTERNS
 
   const deglobOpts = {
@@ -108,7 +111,9 @@ Linter.prototype.lintFiles = function(files, opts, cb) {
 
     let result
     try {
-      result = new self.eslint.CLIEngine(opts.eslintConfig).executeOnFiles(allFiles)
+      result = new self.eslint.CLIEngine(opts.eslintConfig).executeOnFiles(
+        allFiles
+      )
     } catch (err) {
       return cb(err)
     }
@@ -181,7 +186,9 @@ Linter.prototype.parseOpts = function(opts, usePackageJson) {
     if (!envs) return
     if (!Array.isArray(envs) && typeof envs !== 'string') {
       // envs can be an object in `package.json`
-      envs = Object.keys(envs).filter((env) => { return envs[env] })
+      envs = Object.keys(envs).filter(env => {
+        return envs[env]
+      })
     }
     opts.eslintConfig.envs = self.eslintConfig.envs.concat(envs)
   }

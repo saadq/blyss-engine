@@ -8,11 +8,14 @@ const getStdin = require('get-stdin')
 function Cli(opts) {
   const blyss = require('../').linter(opts)
 
-  opts = Object.assign({
-    cmd: 'blyss-engine',
-    tagline: 'JavaScript Custom Style',
-    version: require('../package.json').version
-  }, opts)
+  opts = Object.assign(
+    {
+      cmd: 'blyss-engine',
+      tagline: 'JavaScript Custom Style',
+      version: require('../package.json').version
+    },
+    opts
+  )
 
   const argv = minimist(process.argv.slice(2), {
     alias: {
@@ -22,19 +25,8 @@ function Cli(opts) {
       help: 'h',
       verbose: 'v'
     },
-    boolean: [
-      'fix',
-      'help',
-      'stdin',
-      'verbose',
-      'version'
-    ],
-    string: [
-      'global',
-      'plugin',
-      'parser',
-      'env'
-    ]
+    boolean: ['fix', 'help', 'stdin', 'verbose', 'version'],
+    string: ['global', 'plugin', 'parser', 'env']
   })
 
   // Unix convention: Command line argument `-` is a shorthand for `--stdin`
@@ -44,7 +36,8 @@ function Cli(opts) {
   }
 
   if (argv.help) {
-    if (opts.tagline) console.log('%s - %s (%s)', opts.cmd, opts.tagline, opts.homepage)
+    if (opts.tagline)
+      console.log('%s - %s (%s)', opts.cmd, opts.tagline, opts.homepage)
     console.log(`
 Usage:
     ${opts.cmd} <flags> [FILES...]
@@ -91,7 +84,7 @@ Flags (advanced):
   let stdinText
 
   if (argv.stdin) {
-    getStdin().then((text) => {
+    getStdin().then(text => {
       stdinText = text
       blyss.lintText(text, lintOpts, onResult)
     })
@@ -120,8 +113,8 @@ Flags (advanced):
     console.error('%s: %s (%s)', opts.cmd, opts.tagline, opts.homepage)
 
     // Are any fixable rules present?
-    const isFixable = result.results.some((result) => {
-      return result.messages.some((message) => {
+    const isFixable = result.results.some(result => {
+      return result.messages.some(message => {
         return !!message.fix
       })
     })
@@ -134,11 +127,14 @@ Flags (advanced):
       )
     }
 
-    result.results.forEach((result) => {
-      result.messages.forEach((message) => {
+    result.results.forEach(result => {
+      result.messages.forEach(message => {
         log(
           '  %s:%d:%d: %s%s',
-          result.filePath, message.line || 0, message.column || 0, message.message,
+          result.filePath,
+          message.line || 0,
+          message.column || 0,
+          message.message,
           argv.verbose ? ' (' + message.ruleId + ')' : ''
         )
       })
@@ -152,7 +148,8 @@ Flags (advanced):
     console.error(err.stack || err.message || err)
     console.error(
       '\nIf you think this is a bug in `%s`, open an issue: %s',
-      opts.cmd, opts.bugs
+      opts.cmd,
+      opts.bugs
     )
     process.exitCode = 1
   }
