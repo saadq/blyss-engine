@@ -15,6 +15,7 @@ var DEFAULT_PATTERNS = [
 ]
 
 var DEFAULT_IGNORE = [
+  'flow-typed/npm/**',
   '**/*.min.js',
   '**/bundle.js',
   'coverage/**',
